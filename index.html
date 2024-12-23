@@ -60,6 +60,12 @@
         .flagged {
             background-color: #ffd700;
         }
+
+        .help-note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -72,12 +78,14 @@
             <strong>Stopwatch: </strong><span id="stopwatch">0.00 seconds</span>
         </div>
         <div>
-            <button onclick="startTimer()">Start Timer</button>
-            <button onclick="stopTimer()">Stop Timer</button>
-            <button onclick="resetTimer()">Reset Timer</button>
-            <button onclick="flagTime()">Flag Time</button>
-            <button onclick="nextQuestion()">Next Question</button>
+            <button onclick="startTimer()">Start Timer (S)</button>
+            <button onclick="stopTimer()">Stop Timer (E)</button>
+            <button onclick="resetTimer()">Reset Timer (R)</button>
+            <button onclick="flagTime()">Flag Time (F)</button>
+            <button onclick="nextQuestion()">Next Question (N)</button>
+            <button onclick="previousQuestion()">Previous Question (P)</button>
             <button onclick="exportToExcel()">Export to Excel</button>
+            <button onclick="customizeKeys()">Customize Keybindings</button>
         </div>
     </div>
 
@@ -93,6 +101,19 @@
             <!-- Questions will be dynamically generated -->
         </tbody>
     </table>
+
+    <div class="help-note">
+        <p><strong>Help:</strong> Use the following keyboard shortcuts:</p>
+        <ul>
+            <li><strong>S</strong> to Start Timer</li>
+            <li><strong>E</strong> to Stop Timer</li>
+            <li><strong>R</strong> to Reset Timer</li>
+            <li><strong>F</strong> to Flag the Current Question's Time</li>
+            <li><strong>N</strong> to Move to Next Question</li>
+            <li><strong>P</strong> to Go to Previous Question</li>
+            <li><strong>Export to Excel</strong> to save your progress</li>
+        </ul>
+    </div>
 
     <script>
         let timerRunning = false;
@@ -166,8 +187,20 @@
                 stopwatchElement.textContent = "0.00 seconds";
                 currentQuestion++;
                 currentQuestionElement.textContent = currentQuestion;
+                startTimer(); // Automatically start the timer for the next question
             } else {
                 alert("All questions completed!");
+            }
+        }
+
+        // Move to the previous question
+        function previousQuestion() {
+            if (currentQuestion > 1) {
+                stopTimer();
+                currentQuestion--;
+                currentQuestionElement.textContent = currentQuestion;
+                stopwatchElement.textContent = "0.00 seconds";
+                elapsedTime = 0; // No harm to previous data, just stop the timer
             }
         }
 
@@ -192,6 +225,52 @@
 
         // Initialize the question tracker
         initializeQuestions();
+
+        // Keybindings and event listeners
+        const keyBindings = {
+            'start': 's',       // 'S' for Start
+            'stop': 'e',        // 'E' for Stop
+            'reset': 'r',       // 'R' for Reset
+            'next': 'n',        // 'N' for Next Question
+            'previous': 'p',    // 'P' for Previous Question
+            'flag': 'f'         // 'F' for Flag
+        };
+
+        // Add event listener for keypress events
+        document.addEventListener('keydown', function(event) {
+            if (event.key === keyBindings.start) {
+                startTimer();  // Function to start the stopwatch
+            } else if (event.key === keyBindings.stop) {
+                stopTimer();   // Function to stop the stopwatch
+            } else if (event.key === keyBindings.reset) {
+                resetTimer();  // Function to reset the stopwatch
+            } else if (event.key === keyBindings.next) {
+                nextQuestion();  // Function to go to next question and start the timer automatically
+            } else if (event.key === keyBindings.previous) {
+                previousQuestion();  // Function to go to previous question without affecting any data
+            } else if (event.key === keyBindings.flag) {
+                flagTime();  // Function to flag the current time
+            }
+        });
+
+        // Customize keybindings
+        function customizeKeys() {
+            const startKey = prompt('Press a key for Start (current: ' + keyBindings.start + ')', keyBindings.start);
+            const stopKey = prompt('Press a key for Stop (current: ' + keyBindings.stop + ')', keyBindings.stop);
+            const resetKey = prompt('Press a key for Reset (current: ' + keyBindings.reset + ')', keyBindings.reset);
+            const nextKey = prompt('Press a key for Next Question (current: ' + keyBindings.next + ')', keyBindings.next);
+            const previousKey = prompt('Press a key for Previous Question (current: ' + keyBindings.previous + ')', keyBindings.previous);
+            const flagKey = prompt('Press a key for Flag (current: ' + keyBindings.flag + ')', keyBindings.flag);
+
+            keyBindings.start = startKey || keyBindings.start;
+            keyBindings.stop = stopKey || keyBindings.stop;
+            keyBindings.reset = resetKey || keyBindings.reset;
+            keyBindings.next = nextKey || keyBindings.next;
+            keyBindings.previous = previousKey || keyBindings.previous;
+            keyBindings.flag = flagKey || keyBindings.flag;
+
+            alert('Keybindings updated! Press OK to continue.');
+        }
     </script>
 </body>
 </html>
